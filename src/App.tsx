@@ -1,9 +1,40 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import getFormDigest from "./sharepoint/getFormDigest";
+
+import { spfi, SPBrowser } from "@pnp/sp";
+import "@pnp/sp/webs";
+import "@pnp/sp/lists";
+
+const sp = spfi().using(SPBrowser({ baseUrl: "https://nycdot.sharepoint.com/sites/RRM_dev" }));
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    sp.web().then(async () => {
+      setReady(true);
+      console.log(sp);
+
+      // get the default document library 'Documents'
+      const list = sp.web.lists.getByTitle("WorkUnits");
+      // we can use this 'list' variable to run more queries on the list:
+      const r = await list.select("")();
+
+      // log the list Id to console
+      console.log(r.Id);
+    });
+  });
+
+  useEffect(() => {
+    getFormDigest().then(console.log);
+  }, []);
+
+  if (!ready) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="App">
@@ -27,7 +58,7 @@ function App() {
           >
             Learn React
           </a>
-          {' | '}
+          {" | "}
           <a
             className="App-link"
             href="https://vitejs.dev/guide/features.html"
@@ -39,7 +70,7 @@ function App() {
         </p>
       </header>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

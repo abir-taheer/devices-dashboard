@@ -28,6 +28,7 @@ interface LocationData {
 
 type ServiceTypeValue = "Cell" | "PTT" | "Data" | string;
 type DeviceTypeValue = "Phone" | "Laptop" | "Tablet" | string;
+type ZeroUsageStatusValue = "resolved" | "unresolved" | "pending";
 
 type NotRequiredString = string | null;
 
@@ -65,7 +66,8 @@ type AssignmentCreationProps = {
 type WorkUnitCreationProps = {
   Title: string;
   Number: string;
-  Address: string;
+  RawAddress: string;
+  Address?: LocationData;
 };
 
 type CommentCreationProps = {
@@ -74,12 +76,20 @@ type CommentCreationProps = {
   Comment: string;
 };
 
+type ZeroUsageCreationProps = {
+  AssignmentId: number;
+  Status: ZeroUsageStatusValue;
+  Contacted: boolean;
+  Message: string;
+};
+
 type CreationPropsMap = {
   Assignments: AssignmentCreationProps;
   Devices: DeviceCreationProps;
   WorkUnits: WorkUnitCreationProps;
   Users: UserCreationProps;
   Comments: CommentCreationProps;
+  ZeroUsages: ZeroUsageCreationProps;
 };
 
 type UserData = MetaData & UserCreationProps;
@@ -87,6 +97,7 @@ type DeviceData = MetaData & DeviceCreationProps;
 type WorkUnitData = MetaData & WorkUnitCreationProps;
 type AssignmentData = MetaData & AssignmentCreationProps;
 type CommentData = MetaData & CommentCreationProps;
+type ZeroUsageData = MetaData & ZeroUsageCreationProps;
 
 type ListDataMap = {
   Users: UserData;
@@ -94,4 +105,5 @@ type ListDataMap = {
   WorkUnits: WorkUnitData;
   Assignments: AssignmentData;
   Comments: CommentData;
+  ZeroUsages: ZeroUsageData;
 };

@@ -9,7 +9,6 @@ import AddOutlined from "@mui/icons-material/AddOutlined";
 import UnstyledLink from "../ui/UnstyledLink";
 import BusinessOutlined from "@mui/icons-material/BusinessOutlined";
 import PeopleOutlined from "@mui/icons-material/PeopleOutlined";
-import * as qs from "querystring";
 
 type Props = {
   open: boolean;

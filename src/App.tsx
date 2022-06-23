@@ -8,6 +8,7 @@ import ContentAlignmentContainer from "./comps/navigation/ContentAlignmentContai
 import TopAppBar from "./comps/navigation/TopAppBar";
 import RootNavigation from "./pages/_navigation";
 import NavDrawer from "./comps/navigation/NavDrawer";
+import displaySharepointNewItemWindow from "./utils/displaySharepointNewItemWindow";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -20,6 +21,7 @@ function App() {
           <ContentAlignmentContainer drawerOpen={drawerOpen}>
             <TopAppBar setDrawerOpen={setDrawerOpen} />
             <RootNavigation />
+            <button onClick={() => displaySharepointNewItemWindow("Devices")}>Test popup</button>
           </ContentAlignmentContainer>
         </HashRouter>
       </SnackbarProvider>

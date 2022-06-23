@@ -1,3 +1,13 @@
+interface LocationData {
+  Address: string;
+  CountryOrRegion: string;
+  State: string;
+  City: string;
+  PostalCode: string;
+  Street: string;
+  GeoLoc: string;
+}
+
 interface MetaData {
   Title: string | null;
   FileSystemObjectType: number;
@@ -16,21 +26,34 @@ interface MetaData {
   ComplianceAssetId: null | number;
 }
 
-interface LocationData {
-  Address: string;
-  CountryOrRegion: string;
-  State: string;
-  City: string;
-  PostalCode: string;
-  Street: string;
-  GeoLoc: string;
-}
-
-type ServiceTypeValue = "Cell" | "PTT" | "Data" | string;
 type DeviceTypeValue = "Phone" | "Laptop" | "Tablet" | string;
+type NotRequiredString = string | null;
+type ServiceTypeValue = "Cell" | "PTT" | "Data" | string;
 type ZeroUsageStatusValue = "resolved" | "unresolved" | "pending";
 
-type NotRequiredString = string | null;
+type AssignmentCreationProps = {
+  UserId: number;
+  Status: string;
+  DeviceId: number;
+
+  // ISO-encoded time string
+  ReturnedAt: string;
+};
+
+type CommentCreationProps = {
+  DeviceId: number;
+  AssignmentId: number;
+  Comment: string;
+};
+
+type DeviceCreationProps = {
+  Model: string;
+  Manufacturer: string;
+  Phone: string;
+  DeviceType: DeviceTypeValue;
+  ServiceType: ServiceTypeValue;
+  Tag: string;
+};
 
 type UserCreationProps = {
   Title: string;
@@ -45,35 +68,11 @@ type UserCreationProps = {
   RawWorkUnitAddress: string;
 };
 
-type DeviceCreationProps = {
-  Model: string;
-  Manufacturer: string;
-  Phone: string;
-  DeviceType: DeviceTypeValue;
-  ServiceType: ServiceTypeValue;
-  Tag: string;
-};
-
-type AssignmentCreationProps = {
-  UserId: number;
-  Status: string;
-  DeviceId: number;
-
-  // ISO-encoded time string
-  ReturnedAt: string;
-};
-
 type WorkUnitCreationProps = {
   Title: string;
   Number: string;
   RawAddress: string;
   Address?: LocationData;
-};
-
-type CommentCreationProps = {
-  DeviceId: number;
-  AssignmentId: number;
-  Comment: string;
 };
 
 type ZeroUsageCreationProps = {
@@ -92,18 +91,20 @@ type CreationPropsMap = {
   ZeroUsages: ZeroUsageCreationProps;
 };
 
-type UserData = MetaData & UserCreationProps;
-type DeviceData = MetaData & DeviceCreationProps;
-type WorkUnitData = MetaData & WorkUnitCreationProps;
 type AssignmentData = MetaData & AssignmentCreationProps;
 type CommentData = MetaData & CommentCreationProps;
+type DeviceData = MetaData & DeviceCreationProps;
+type UserData = MetaData & UserCreationProps;
+type WorkUnitData = MetaData & WorkUnitCreationProps;
 type ZeroUsageData = MetaData & ZeroUsageCreationProps;
 
 type ListDataMap = {
-  Users: UserData;
-  Devices: DeviceData;
-  WorkUnits: WorkUnitData;
   Assignments: AssignmentData;
   Comments: CommentData;
+  Devices: DeviceData;
+  Users: UserData;
+  WorkUnits: WorkUnitData;
   ZeroUsages: ZeroUsageData;
 };
+
+type ListName = keyof CreationPropsMap;

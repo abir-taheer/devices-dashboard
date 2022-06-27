@@ -1,45 +1,53 @@
-import { ListChangeEmitter } from "../hooks/useSubscribeToListChanges";
+import EventEmitter from "events";
 
-type CacheItem<List extends ListName> = {
-  expires: Date;
+export const CacheChangeEmitter = new EventEmitter();
+
+type RawItemListCacheEntry<List extends ListName> = {
   items: ListDataMap[List][];
+  version: number;
+  expiration: Date;
+  populated: boolean;
 };
 
 type RawListItemCacheValue = {
-  [List in ListName]?: CacheItem<List>;
+  [List in ListName]?: RawItemListCacheEntry<List>;
 };
-
 const RawListItemCache: RawListItemCacheValue = {};
 
 const maxAge = 1000 * 60 * 5;
 
-export const CacheProxyHandler = {
-  set<List extends ListName>(obj: RawListItemCacheValue, prop: List, value: ListDataMap[List][]) {
-    const expires = new Date(Date.now() + maxAge);
-    // Indicate success
-    const newValue = {
-      items: value,
-      expires,
-    };
-
-    obj[prop] = newValue as RawListItemCacheValue[List];
-
-    ListChangeEmitter.emit("change", prop);
-    return true;
-  },
-
-  get<List extends ListName>(obj: RawListItemCacheValue, prop: List) {
-    const item = obj[prop];
-    const now = new Date();
-
-    if (item && item.expires > now) {
-      return item.items;
-    }
-    return [];
-  },
-};
-
 // This is a proxied object that allows us to handle the expirations when fetching cached objects
-const Cache = new Proxy(RawListItemCache, CacheProxyHandler);
+class ListItemCache {
+  public static set<List extends ListName>(list: List, items: ListDataMap[List][]) {
+    const version = RawListItemCache[list]?.version + 1 || 0;
+    const expiration = new Date(Date.now() + maxAge);
+    const populated = true;
 
-export default Cache;
+    // @ts-ignore
+    RawListItemCache[list] = {
+      version,
+      items,
+      expiration,
+      populated,
+    } as RawItemListCacheEntry<List>;
+
+    CacheChangeEmitter.emit("change", list);
+  }
+
+  public static get<List extends ListName>(list: List): RawItemListCacheEntry<List> {
+    const cache = RawListItemCache[list];
+
+    if (!cache) {
+      return {
+        version: -1,
+        items: [],
+        expiration: new Date(),
+        populated: false,
+      };
+    }
+
+    return cache;
+  }
+}
+
+export default ListItemCache;

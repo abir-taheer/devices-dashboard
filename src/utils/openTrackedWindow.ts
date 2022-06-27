@@ -7,7 +7,7 @@ export type OnWindowCloseParams = {
 
 export type OpenTrackedWindowParams = {
   onWindowClose?: (props: OnWindowCloseParams) => void;
-  closeOnNavigation?: boolean;
+  shouldCloseWindow?: (w: WindowProxy) => boolean;
   url: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
   height?: number;
@@ -21,7 +21,7 @@ export type OpenTrackedWindowParams = {
 
 export default function openTrackedWindow({
   onWindowClose,
-  closeOnNavigation,
+  shouldCloseWindow,
   url,
   height = 600,
   width = 600,
@@ -86,7 +86,7 @@ export default function openTrackedWindow({
     }
 
     // If the user navigates away from the url that was provided, then we close the window for convenience
-    if (closeOnNavigation && location && !safeUrls.has(location?.href)) {
+    if (shouldCloseWindow && shouldCloseWindow(trackedWindow)) {
       trackedWindow.close();
     }
   };

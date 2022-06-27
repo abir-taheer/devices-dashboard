@@ -1,4 +1,4 @@
-import { ListChangeEmitter } from "../hooks/useSubscribeToListChanges";
+import { ListChangeEmitter } from "../hooks/useSubscribeToCacheChanges";
 import openTrackedWindow, { OpenTrackedWindowParams } from "./openTrackedWindow";
 
 // If the popup is open for at least 3 seconds then qualify it as an edit
@@ -18,7 +18,7 @@ export default function displaySharepointNewItemWindow(
   const url = `https://nycdot.sharepoint.com/sites/RRM_dev/Lists/${list}/NewForm.aspx`;
 
   const onWindowClose: OpenTrackedWindowParams["onWindowClose"] = ({ location, durationOpen }) => {
-    const urlChanged = location && location.href !== url;
+    const urlChanged = location?.href && location.href !== url;
 
     const isEdit = durationOpen >= minimumTimeToQualifyAsEdit || urlChanged;
 
@@ -32,7 +32,17 @@ export default function displaySharepointNewItemWindow(
     }
   };
 
-  const trackedWindow = openTrackedWindow({ url, closeOnNavigation: true, onWindowClose });
+  const trackedWindow = openTrackedWindow({
+    url,
+    shouldCloseWindow: (w) => {
+      try {
+        return w.location.href && w.location.href !== "about:blank" && w.location.href !== url;
+      } catch (er) {
+        return false;
+      }
+    },
+    onWindowClose,
+  });
 
   return trackedWindow;
 }

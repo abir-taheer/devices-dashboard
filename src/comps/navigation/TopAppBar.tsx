@@ -1,15 +1,15 @@
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import TextField from "@mui/material/TextField";
-import SearchOutlined from "@mui/icons-material/SearchOutlined";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import UniversalSearchResults from "./UniversalSearchResults";
-import IconButton from "@mui/material/IconButton";
+import styled from "@emotion/styled";
+import ClickAwayListener from "@mui/base/ClickAwayListener";
 import CloseOutlined from "@mui/icons-material/CloseOutlined";
 import Menu from "@mui/icons-material/Menu";
+import SearchOutlined from "@mui/icons-material/SearchOutlined";
+import AppBar from "@mui/material/AppBar";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import Toolbar from "@mui/material/Toolbar";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import ClickAwayListener from "@mui/base/ClickAwayListener";
-import styled from "@emotion/styled";
+import UniversalSearchResults from "./UniversalSearchResults";
 
 // This is the element that is presented below the search bar once the search is in focus and has a non-empty value
 const ResultsContainer = styled.div(({ hasValue }: { hasValue: boolean }) => ({

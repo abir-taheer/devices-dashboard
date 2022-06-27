@@ -1,8 +1,8 @@
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { ReactChildren, ReactNode } from "react";
-import { Link, NavLinkProps, useLocation } from "react-router-dom";
+import { ReactNode } from "react";
+import { NavLinkProps, useLocation } from "react-router-dom";
 import UnstyledLink from "../ui/UnstyledLink";
 
 type SearchItemResultProps =

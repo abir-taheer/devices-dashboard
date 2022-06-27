@@ -1,15 +1,17 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 
-import { spfi, SPBrowser, SPFI } from "@pnp/sp";
-import "@pnp/sp/webs";
-import "@pnp/sp/lists";
-import "@pnp/sp/site-users/web";
-import "@pnp/sp/site-users";
+import { SPBrowser, spfi, SPFI } from "@pnp/sp";
 import "@pnp/sp/items";
+import "@pnp/sp/lists";
+import "@pnp/sp/site-users";
+import "@pnp/sp/site-users/web";
+import "@pnp/sp/webs";
 
 import { ISiteUserInfo } from "@pnp/sp/site-users";
-import { SHAREPOINT_URL } from "../constants";
+import { SHAREPOINT_URL } from "../../constants";
+import openTrackedWindow from "../../utils/openTrackedWindow";
+import CenteredCircularProgress from "../ui/CenteredCircularProgress";
 
 const sp = spfi().using(SPBrowser({ baseUrl: SHAREPOINT_URL }));
 
@@ -27,11 +29,9 @@ const defaultValue: SPContextValue = {
   sp,
 };
 
-export const SPContext = createContext<SPContextValue>(defaultValue);
+const SPContext = createContext<SPContextValue>(defaultValue);
 
-export default function SPContextProvider({ children }: Props) {
-  return <SPContext.Provider value={defaultValue}>{children}</SPContext.Provider>;
-
+export function SPContextProvider({ children }: Props) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<null | Error>(null);
   const [user, setUser] = useState<null | ISiteUserInfo>(null);
@@ -48,8 +48,6 @@ export default function SPContextProvider({ children }: Props) {
     await sp.web();
     const currentUser = await sp.web.currentUser();
 
-    const items = await sp.web.lists.getByTitle("Users").items();
-
     setUser(currentUser);
   }, []);
 
@@ -65,18 +63,28 @@ export default function SPContextProvider({ children }: Props) {
           );
 
           if (confirmation) {
-            const loginWindow = window.open(
-              SHAREPOINT_URL + "/SitePages/Login-Status.aspx",
-              "_blank",
-              "location=no,toolbar=no,menubar=no,width=1000,height=750"
-            );
+            const start = new Date();
 
-            const closeCheck = setInterval(() => {
-              if (loginWindow.closed) {
-                clearInterval(closeCheck);
-                window.location.reload();
-              }
-            }, 500);
+            openTrackedWindow({
+              url: SHAREPOINT_URL + "/SitePages/Login-Status.aspx",
+              shouldCloseWindow: (w) => {
+                const now = new Date();
+                const durationOpen = now.getTime() - start.getTime();
+
+                // Give 5 seconds for the redirect to the login screen to happen
+                if (durationOpen < 5000) {
+                  return false;
+                }
+
+                // If after 5 seconds they're on the correct page, probably successful login. Close the popup
+                try {
+                  return w.location.href === SHAREPOINT_URL + "/SitePages/Login-Status.aspx";
+                } catch (er) {
+                  return false;
+                }
+              },
+              onWindowClose: () => window.location.reload(),
+            });
           }
         }
 
@@ -91,8 +99,10 @@ export default function SPContextProvider({ children }: Props) {
   }, [error]);
 
   if (!ready) {
-    return <p>Loading...</p>;
+    return <CenteredCircularProgress fullScreen />;
   }
 
   return <SPContext.Provider value={value}>{children}</SPContext.Provider>;
 }
+
+export default SPContext;

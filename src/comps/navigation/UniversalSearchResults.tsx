@@ -1,15 +1,13 @@
 import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import ListSubheader from "@mui/material/ListSubheader";
-import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
+import ListSubheader from "@mui/material/ListSubheader";
+import Typography from "@mui/material/Typography";
 
-import { Fragment, useContext, useEffect, useState } from "react";
-import CorporateFareOutlined from "@mui/icons-material/CorporateFareOutlined";
 import PersonOutlined from "@mui/icons-material/PersonOutlined";
-import EmojiTransportationOutlined from "@mui/icons-material/EmojiTransportationOutlined";
-import SearchItemResult from "./SearchItemResult";
+import { Fragment, useState } from "react";
 import CenteredCircularProgress from "../ui/CenteredCircularProgress";
+import SearchItemResult from "./SearchItemResult";
 
 export type UniversalSearchResultsProps = {
   search: string;

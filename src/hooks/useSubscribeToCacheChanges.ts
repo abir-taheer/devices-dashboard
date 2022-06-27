@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
 import EventEmitter from "events";
+import { useCallback, useEffect, useState } from "react";
+import { CacheChangeEmitter } from "../utils/ListItemCache";
 
 export const ListChangeEmitter = new EventEmitter();
 
-export default function useSubscribeToListChanges<List extends ListName>(list: List) {
+export default function useSubscribeToCacheChanges<List extends ListName>(list: List) {
   const [version, setVersion] = useState(0);
 
   const listener = useCallback(
@@ -16,10 +17,10 @@ export default function useSubscribeToListChanges<List extends ListName>(list: L
   );
 
   useEffect(() => {
-    ListChangeEmitter.addListener("change", listener);
+    CacheChangeEmitter.addListener("change", listener);
 
     return () => {
-      ListChangeEmitter.removeListener("change", listener);
+      CacheChangeEmitter.removeListener("change", listener);
     };
   }, [listener]);
 

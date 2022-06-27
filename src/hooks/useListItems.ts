@@ -1,7 +1,8 @@
-import { useState } from "react";
-import useSubscribeToListChanges from "./useSubscribeToListChanges";
+import ListItemCache from "../utils/ListItemCache";
+import useSubscribeToCacheChanges from "./useSubscribeToCacheChanges";
 
 export default function useListItems<List extends ListName>(list: List) {
-  const [items, setItems] = useState<ListDataMap[List][]>([]);
-  useSubscribeToListChanges(list);
+  useSubscribeToCacheChanges(list);
+
+  return ListItemCache.get(list);
 }

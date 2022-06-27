@@ -71,7 +71,6 @@ type UserCreationProps = {
 type WorkUnitCreationProps = {
   Title: string;
   Number: string;
-  RawAddress: string;
   Address?: LocationData;
 };
 
@@ -107,4 +106,4 @@ type ListDataMap = {
   ZeroUsages: ZeroUsageData;
 };
 
-type ListName = keyof CreationPropsMap;
+type ListName = keyof ListDataMap;

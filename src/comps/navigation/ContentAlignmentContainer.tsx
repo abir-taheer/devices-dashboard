@@ -1,24 +1,30 @@
-import { styled } from "@mui/system";
 import { ReactNode } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 type Props = {
   drawerOpen: boolean;
   children: ReactNode;
   className?: string;
+  width: number;
 };
 
-const styles = {
+const getStyles = ({ width }) => ({
   open: {
-    marginLeft: 250,
+    marginLeft: width,
   },
   closed: {
     marginLeft: 0,
   },
-};
+});
 
-export default function ContentAlignmentContainer({ drawerOpen, children, className }: Props) {
+export default function ContentAlignmentContainer({
+  drawerOpen,
+  children,
+  className,
+  width,
+}: Props) {
   const [searchParams] = useSearchParams();
+  const styles = getStyles({ width });
 
   const hidden = searchParams.get("hideDrawer") === "true";
 

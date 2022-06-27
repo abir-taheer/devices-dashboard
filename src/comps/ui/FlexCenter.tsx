@@ -1,5 +1,5 @@
-import { FC, ReactNode } from "react";
 import { styled } from "@mui/system";
+import { FC, ReactNode } from "react";
 
 export interface FlexCenterProps {
   fullScreen?: boolean;

@@ -1,5 +1,5 @@
-import { ListChangeEmitter } from "../hooks/useSubscribeToListChanges";
-import { OpenTrackedWindowParams } from "./openTrackedWindow";
+import { ListChangeEmitter } from "../hooks/useSubscribeToCacheChanges";
+import openTrackedWindow, { OpenTrackedWindowParams } from "./openTrackedWindow";
 
 // If the window is open for three seconds or more, count that as an edit
 const minumumTimeToQualifyAsEdit = 1000 * 3;
@@ -7,12 +7,12 @@ const minumumTimeToQualifyAsEdit = 1000 * 3;
 export default function displaySharepointEditWindow<List extends ListName>(
   list: List,
   id: ListDataMap[List]["ID"],
-  onClose: (props: { isEdit: boolean }) => void
+  onClose?: (props: { isEdit: boolean }) => void
 ) {
   const url = `https://nycdot.sharepoint.com/sites/RRM_dev/Lists/${list}/EditForm.aspx?ID=${id}`;
 
   const onWindowClose: OpenTrackedWindowParams["onWindowClose"] = ({ location, durationOpen }) => {
-    const urlChanged = location && location.href !== url;
+    const urlChanged = location?.href && location.href !== url;
 
     const isEdit = durationOpen >= minumumTimeToQualifyAsEdit || urlChanged;
 
@@ -25,4 +25,18 @@ export default function displaySharepointEditWindow<List extends ListName>(
       onClose({ isEdit });
     }
   };
+
+  const trackedWindow = openTrackedWindow({
+    url,
+    shouldCloseWindow: (w) => {
+      try {
+        return w.location.href && w.location.href !== "about:blank" && w.location.href !== url;
+      } catch (er) {
+        return false;
+      }
+    },
+    onWindowClose,
+  });
+
+  return trackedWindow;
 }

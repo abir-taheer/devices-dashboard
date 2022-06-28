@@ -8,6 +8,7 @@ export type OnWindowCloseParams = {
 export type OpenTrackedWindowParams = {
   onWindowClose?: (props: OnWindowCloseParams) => void;
   shouldCloseWindow?: (w: WindowProxy) => boolean;
+  onReady?: (w: WindowProxy) => void;
   url: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
   height?: number;
@@ -18,6 +19,26 @@ export type OpenTrackedWindowParams = {
   checkInterval?: number;
   focusOnOpen?: boolean;
 };
+export function hideSharepointUi(w: WindowProxy, attempt: number = 0) {
+  function hideElement(selector: string) {
+    const el = w.document?.querySelector?.(selector);
+    if (el) {
+      // @ts-ignore
+      el.style.display = "none";
+    } else if (attempt < 3) {
+      // The page might not be loaded yet, try again in a second but if it fails 3 times then give up
+      setTimeout(hideSharepointUi, 1000, w, attempt + 1);
+    }
+  }
+
+  hideElement(".od-Command--Comment");
+  hideElement(".od-SuiteNav");
+  hideElement(".od-SuiteNav");
+  hideElement(".od-SuiteNav");
+  hideElement(".Files-rightPane");
+  hideElement(".Files-leftNav");
+  hideElement(".sp-appBar");
+}
 
 export default function openTrackedWindow({
   onWindowClose,
@@ -31,6 +52,7 @@ export default function openTrackedWindow({
   top = 0,
   checkInterval = 200,
   focusOnOpen = true,
+  onReady,
 }: OpenTrackedWindowParams) {
   let windowFeatures: string = "";
 
@@ -54,8 +76,6 @@ export default function openTrackedWindow({
     windowFeatures += `top=${top},`;
   }
 
-  const safeUrls = new Set(["about:blank", url]);
-
   let interval: ReturnType<typeof setTimeout>;
 
   const trackedWindow = window.open(url, target, windowFeatures);
@@ -65,6 +85,7 @@ export default function openTrackedWindow({
     trackedWindow.focus();
   }
 
+  let calledReady = false;
   let location: Location | null = null;
 
   const checkState = () => {
@@ -76,6 +97,15 @@ export default function openTrackedWindow({
     } catch (er) {
       // We're not allowed to access the location of the popup
       // Just don't do anything for now
+    }
+
+    try {
+      if (trackedWindow?.document?.readyState === "complete" && !calledReady && onReady) {
+        onReady(trackedWindow);
+        calledReady = true;
+      }
+    } catch (er) {
+      console.error(er);
     }
 
     if (trackedWindow.closed && onWindowClose) {

@@ -1,5 +1,5 @@
 import { ListChangeEmitter } from "../hooks/useSubscribeToCacheChanges";
-import openTrackedWindow, { OpenTrackedWindowParams } from "./openTrackedWindow";
+import openTrackedWindow, { hideSharepointUi, OpenTrackedWindowParams } from "./openTrackedWindow";
 
 // If the popup is open for at least 3 seconds then qualify it as an edit
 const minimumTimeToQualifyAsEdit = 1000 * 3;
@@ -41,6 +41,7 @@ export default function displaySharepointNewItemWindow(
         return false;
       }
     },
+    onReady: hideSharepointUi,
     onWindowClose,
   });
 

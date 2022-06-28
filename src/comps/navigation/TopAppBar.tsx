@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import searchLists from "../../utils/searchLists";
 import UniversalSearchResults from "./UniversalSearchResults";
 
 // This is the element that is presented below the search bar once the search is in focus and has a non-empty value
@@ -55,6 +56,10 @@ export default function TopAppBar({ setDrawerOpen }: Props) {
       setSearch(value);
     }
   }, [typing, search, value]);
+
+  useEffect(() => {
+    console.log(searchLists(search, ["WorkUnits", "Devices", "Users"]));
+  }, [search]);
 
   const toggleDrawer = () => setDrawerOpen((current) => !current);
 

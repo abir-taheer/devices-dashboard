@@ -34,15 +34,15 @@ type ZeroUsageStatusValue = "resolved" | "unresolved" | "pending";
 type AssignmentCreationProps = {
   UserId: number;
   Status: string;
-  DeviceId: number;
+  DeviceId: DeviceData["Id"];
 
   // ISO-encoded time string
   ReturnedAt: string;
 };
 
 type CommentCreationProps = {
-  DeviceId: number;
-  AssignmentId: number;
+  DeviceId: DeviceData["Id"];
+  AssignmentId: AssignmentData["Id"];
   Comment: string;
 };
 
@@ -51,7 +51,7 @@ type DeviceCreationProps = {
   Manufacturer: string;
   Phone: string;
   DeviceType: DeviceTypeValue;
-  ServiceType: ServiceTypeValue;
+  ServiceType: ServiceTypeValue[];
   Tag: string;
 };
 
@@ -62,7 +62,7 @@ type UserCreationProps = {
   LastName: string;
   PMS: string;
   Email: string;
-  WorkUnitId: number;
+  WorkUnitId: WorkUnitData["Id"];
   RawWorkUnitNumber: string;
   RawWorkUnitTitle: string;
   RawWorkUnitAddress: string;

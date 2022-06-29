@@ -2,6 +2,7 @@ import DataLoader from "dataloader";
 import ListItemCache from "./ListItemCache";
 
 const DataLoaderCacheMap = {};
+
 const loaders: {
   [key: string]: { [key: string]: DataLoader<any, any> };
 } = {};

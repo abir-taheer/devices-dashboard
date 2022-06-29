@@ -13,6 +13,15 @@ type RawItemListCacheEntry<List extends ListName> = {
 type RawListItemCacheValue = {
   [List in ListName]?: RawItemListCacheEntry<List>;
 };
+
+export type ItemIdMapValue = {
+  [List in ListName]?: {
+    [id: number | string]: ListDataMap[List];
+  };
+};
+
+const ItemIdMap: ItemIdMapValue = {};
+
 const RawListItemCache: RawListItemCacheValue = {};
 
 const maxAge = 1000 * 60 * 2; // 2 minutes
@@ -54,6 +63,12 @@ class ListItemCache {
       populated,
     } as RawItemListCacheEntry<List>;
 
+    // Update the id map too
+    ItemIdMap[list] = items.reduce((map, item) => {
+      map[item.ID] = item;
+      return map;
+    }, {});
+
     CacheChangeEmitter.emit("change", list);
   }
 
@@ -71,6 +86,19 @@ class ListItemCache {
 
     return cache;
   }
+}
+
+export function getCachedListItemById<List extends ListName>(
+  list: List,
+  id: number | string
+): ListDataMap[List] {
+  const cache = ItemIdMap[list];
+
+  if (!cache) {
+    return null;
+  }
+
+  return cache[id];
 }
 
 export default ListItemCache;

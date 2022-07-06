@@ -12,6 +12,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { useContext } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
+import { makeStyles } from "tss-react/mui";
 import { ListUpdatingContext } from "../context/ListUpdatingContext";
 import SPContext from "../context/SPContext";
 import UnstyledLink from "../ui/UnstyledLink";
@@ -22,11 +23,51 @@ type Props = {
   setWidth: (width: number) => void;
 };
 
+type StyleProps = {
+  width: number;
+};
+
+const useStyles = makeStyles<StyleProps>()((theme, { width }) => ({
+  drawer: {
+    "& .MuiDrawer-paper": {
+      boxSizing: "border-box",
+      width,
+      borderRight: "1px solid rgba(0,0,0,0.2)",
+    },
+  },
+  contentContainer: {
+    position: "relative",
+    width: "100%",
+  },
+  draggableBar: {
+    width: "4px",
+    height: "100vh",
+    position: "absolute",
+    right: 0,
+    border: 0,
+    cursor: "ew-resize",
+    background: "rgba(0,0,0,0)",
+  },
+  header: {
+    padding: theme.spacing(3),
+  },
+  divider: {
+    margin: theme.spacing(1, 0),
+  },
+  updatingListItemText: {
+    fontSize: 12,
+  },
+  updatingListItem: {
+    opacity: 0.8,
+  },
+}));
+
 export default function NavDrawer({ open, width, setWidth }: Props) {
   const location = useLocation();
   const [search] = useSearchParams();
   const { user } = useContext(SPContext);
   const listsUpdating = useContext(ListUpdatingContext);
+  const { classes } = useStyles({ width });
 
   const hidden = search.get("hideDrawer") === "true";
 
@@ -35,33 +76,15 @@ export default function NavDrawer({ open, width, setWidth }: Props) {
   }
 
   return (
-    <Drawer
-      variant="persistent"
-      open={open}
-      anchor="left"
-      sx={{
-        "& .MuiDrawer-paper": {
-          boxSizing: "border-box",
-          width,
-          borderRight: "1px solid rgba(0,0,0,0.2)",
-        },
-      }}
-    >
-      <div style={{ position: "relative", width: "100%" }}>
+    <Drawer variant="persistent" open={open} anchor="left" className={classes.drawer}>
+      <div className={classes.contentContainer}>
         <div
-          style={{
-            width: "4px",
-            height: "100vh",
-            position: "absolute",
-            right: 0,
-            border: 0,
-            cursor: "ew-resize",
-            background: "rgba(0,0,0,0)",
-          }}
+          className={classes.draggableBar}
           draggable
           onDrag={(ev) => ev.screenX && setWidth(Math.min(600, Math.max(250, ev.screenX)))}
         />
-        <div style={{ padding: 20 }}>
+
+        <div className={classes.header}>
           <Typography variant="h2" align="center">
             RRM Devices Dashboard
           </Typography>
@@ -116,7 +139,7 @@ export default function NavDrawer({ open, width, setWidth }: Props) {
             </UnstyledLink>
           </List>
 
-          <Divider sx={{ margin: 1 }} />
+          <Divider className={classes.divider} />
 
           {!!listsUpdating.length && (
             <>
@@ -125,17 +148,17 @@ export default function NavDrawer({ open, width, setWidth }: Props) {
               </Typography>
 
               <List>
-                {listsUpdating.map((list) => (
+                {listsUpdating.map((list, index) => (
                   <ListItem
                     alignItems="flex-start"
-                    key={list}
+                    key={list + index}
                     color="secondary.main"
-                    sx={{ opacity: 0.8 }}
+                    className={classes.updatingListItem}
                   >
                     <ListItemIcon>
                       <CircularProgress size={16} color="secondary" />
                     </ListItemIcon>
-                    <ListItemText sx={{ fontSize: 12 }} primary={list} />
+                    <ListItemText className={classes.updatingListItemText} primary={list} />
                   </ListItem>
                 ))}
               </List>

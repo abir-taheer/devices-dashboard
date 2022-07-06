@@ -91,14 +91,14 @@ class ListItemCache {
 export function getCachedListItemById<List extends ListName>(
   list: List,
   id: number | string
-): ListDataMap[List] {
+): ListDataMap[List] | null {
   const cache = ItemIdMap[list];
 
   if (!cache) {
     return null;
   }
 
-  return cache[id];
+  return cache[id] as ListDataMap[List];
 }
 
 export default ListItemCache;

@@ -1,60 +1,22 @@
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import createCache from "@emotion/cache";
+import { CacheProvider } from "@emotion/react";
+import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#6c5ce7",
-      contrastText: "#fff",
-    },
-    secondary: {
-      main: "#10ac84",
-      contrastText: "#fff",
-    },
-  },
-  typography: {
-    fontFamily: `'Outfit', sans-serif`,
-    fontSize: 16,
-    h1: {
-      fontSize: "2em",
-      margin: "0.67em 0",
-      fontWeight: "bold",
-    },
-    h2: {
-      fontSize: "1.5em",
-      margin: "0.67em 0",
-      fontWeight: "bold",
-    },
-    h3: {
-      fontSize: "1.17em",
-      margin: "0.67em 0",
-      fontWeight: "bold",
-    },
-    h4: {
-      fontSize: "1.1em",
-      margin: "0.67em 0",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1em",
-      margin: "0.67em 0",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.1em",
-      margin: "0.67em 0",
-      fontWeight: "bold",
-    },
-    body1: {
-      margin: "0.=em 0",
-    },
-  },
-});
+import { theme } from "../../theme/theme";
 
 type Props = {
   children: ReactNode;
 };
 
+export const muiCache = createCache({
+  key: "mui",
+  prepend: true,
+});
+
 export default function MuiThemeProvider({ children }: Props) {
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return (
+    <CacheProvider value={muiCache}>
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+    </CacheProvider>
+  );
 }

@@ -33,7 +33,7 @@ type ZeroUsageStatusValue = "resolved" | "unresolved" | "pending";
 
 type AssignmentCreationProps = {
   UserId: number;
-  Status: string;
+  Status: "Active" | "Closed";
   DeviceId: DeviceData["Id"];
 
   // ISO-encoded time string
@@ -71,7 +71,7 @@ type UserCreationProps = {
 type WorkUnitCreationProps = {
   Title: string;
   Number: string;
-  Address?: LocationData;
+  Address?: string;
 };
 
 type ZeroUsageCreationProps = {

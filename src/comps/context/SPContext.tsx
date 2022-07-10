@@ -13,7 +13,7 @@ import { SHAREPOINT_URL } from "../../constants";
 import openTrackedWindow from "../../utils/openTrackedWindow";
 import CenteredCircularProgress from "../ui/CenteredCircularProgress";
 
-const sp = spfi().using(SPBrowser({ baseUrl: SHAREPOINT_URL }));
+export const sp = spfi().using(SPBrowser({ baseUrl: SHAREPOINT_URL }));
 
 type Props = {
   children: ReactNode;

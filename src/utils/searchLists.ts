@@ -4,7 +4,8 @@ import ListItemCache from "./ListItemCache";
 export default function searchLists<Fields extends ListName>(
   query: string,
   lists: Fields[],
-  maxResults: number = 10
+  maxResults: number = 10,
+  minScore: number = 0.7
 ) {
   // Get all of the unique words from the query
   const words = Array.from(
@@ -43,7 +44,7 @@ export default function searchLists<Fields extends ListName>(
 
       return arr.concat(possibles);
     }, [] as unknown as MatchArray)
-    .filter((item) => item.score >= 0.7)
+    .filter((item) => item.score >= minScore)
     .sort((a, b) => b.score - a.score)
     .slice(0, maxResults);
 

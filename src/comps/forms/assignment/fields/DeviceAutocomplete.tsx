@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import { useMemo } from "react";
 import { makeStyles } from "tss-react/mui";
 import useSubscribeToCacheChanges from "../../../../hooks/useSubscribeToCacheChanges";
+import formatPhoneNumber from "../../../../utils/formatPhoneNumber";
 import ListItemCache, { getCachedListItemById } from "../../../../utils/ListItemCache";
 import searchLists from "../../../../utils/searchLists";
 import TextHighlight from "../../../ui/TextHightlight";
@@ -20,26 +21,26 @@ const useStyles = makeStyles()((theme) => ({
   },
 }));
 
-type Value = UserData["Id"];
+type Value = DeviceData["Id"];
 
-export type UserAutocompleteComponentProps = AutocompleteProps<Value, false, false, false>;
+export type DeviceAutocompleteComponentProps = AutocompleteProps<Value, false, false, false>;
 
 type Props = {
   name?: string;
   label?: string;
   value: Value;
-  handleChange: UserAutocompleteComponentProps["onChange"];
+  handleChange: DeviceAutocompleteComponentProps["onChange"];
   error?: string;
   helperText?: string;
   fullWidth?: boolean;
   disabled?: boolean;
   touched?: boolean;
-  handleBlur?: UserAutocompleteComponentProps["onBlur"];
+  handleBlur?: DeviceAutocompleteComponentProps["onBlur"];
 };
 
-export default function UserAutocomplete({
+export default function DeviceAutocomplete({
   name,
-  label = "Select a User",
+  label = "Select a Device",
   handleChange,
   fullWidth,
   disabled,
@@ -49,13 +50,13 @@ export default function UserAutocomplete({
   touched,
   helperText,
 }: Props) {
-  const UserCacheVersion = useSubscribeToCacheChanges("Users");
+  const DeviceCacheVersion = useSubscribeToCacheChanges("Devices");
 
   const { classes } = useStyles();
 
   const options = useMemo(
-    () => ListItemCache.get("Users").items.map((a) => a.Id),
-    [UserCacheVersion]
+    () => ListItemCache.get("Devices").items.map((a) => a.Id),
+    [DeviceCacheVersion]
   );
 
   return (
@@ -65,30 +66,20 @@ export default function UserAutocomplete({
         // This field is the unique react memoization key when rendering the options list
         getOptionLabel={(option) => {
           // We don't have to worry about lookup time since it's already indexed by id. Lookups happen in constant time
-          const user = getCachedListItemById("Users", option);
-          const workUnit = getCachedListItemById("WorkUnits", user.WorkUnitId);
+          const device = getCachedListItemById("Devices", option);
 
           return [
-            `(ID: ${user.Id}) `,
-            user?.FirstName,
-            user?.LastName,
-            "- " + user?.Title,
-            "@ " + workUnit?.Title,
+            `(ID: ${option})`,
+            formatPhoneNumber(device.Phone),
+            device.Manufacturer,
+            device.Model,
           ]
             .filter(Boolean)
             .join(" ");
         }}
         renderOption={(props, option, { inputValue }) => {
-          const user = getCachedListItemById("Users", option);
-          const workUnit = getCachedListItemById("WorkUnits", user.WorkUnitId);
+          const device = getCachedListItemById("Devices", option);
 
-          let address: string | undefined;
-          if (workUnit.Address) {
-            try {
-              const { DisplayName } = JSON.parse(workUnit.Address);
-              address = DisplayName;
-            } catch (er) {}
-          }
           return (
             <ListItem {...props}>
               <ListItemText
@@ -96,26 +87,17 @@ export default function UserAutocomplete({
                   <Typography variant="inherit" fontWeight={600}>
                     <TextHighlight
                       search={inputValue}
-                      text={[user.FirstName, user.LastName].join(" ")}
+                      text={[device.Manufacturer, device.Model].join(" - ")}
                     />
                   </Typography>
                 }
                 secondary={
                   <Typography variant="inherit" className={classes.secondaryLabel}>
-                    {!!workUnit && (
-                      <>
-                        <TextHighlight
-                          search={inputValue}
-                          text={`${user.Title} ${user.Level ? `(Level ${user.Level})` : ""}`}
-                        />
-                        <br />
-                        <span>
-                          {workUnit.Title} - {workUnit.Number}
-                        </span>
-                        <br />
-                        <span>{address}</span>
-                      </>
-                    )}
+                    <>
+                      {formatPhoneNumber(device.Phone)}
+                      <br />
+                      <span>{device.ServiceType.join(", ")}</span>
+                    </>
                   </Typography>
                 }
               />
@@ -126,7 +108,7 @@ export default function UserAutocomplete({
         onChange={handleChange}
         options={options}
         filterOptions={(options, { inputValue }) =>
-          searchLists(inputValue, ["Users"]).map((a) => a.item.Id)
+          searchLists(inputValue, ["Devices"], 15).map((a) => a.item.Id)
         }
         disabled={disabled}
         value={value}

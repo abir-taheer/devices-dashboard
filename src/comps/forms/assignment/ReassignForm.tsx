@@ -1,8 +1,9 @@
+import { Stack } from "@mui/material";
+import Button from "@mui/material/Button";
 import { FormikConfig, FormikErrors, useFormik } from "formik";
-import { useMemo } from "react";
 import { makeStyles } from "tss-react/mui";
-import useSubscribeToCacheChanges from "../../../hooks/useSubscribeToCacheChanges";
-import ListItemCache from "../../../utils/ListItemCache";
+import { sp } from "../../context/SPContext";
+import DeviceAutocomplete from "./fields/DeviceAutocomplete";
 import UserAutocomplete from "./fields/UserAutocomplete";
 
 type Value = {
@@ -38,40 +39,92 @@ const validate: FormConfig["validate"] = (values) => {
   return errors;
 };
 
-const onSubmit: FormConfig["onSubmit"] = (values, { setSubmitting }) => {};
+const onSubmit: FormConfig["onSubmit"] = async (values, { setSubmitting, setErrors }) => {
+  try {
+    await sp.web.lists.getByTitle("Assignments").items.add({
+      UserId: values.UserId,
+      DeviceId: values.DeviceId,
+      Status: "Active",
+    });
+  } catch (er) {
+    setErrors({ DeviceId: "There was an error assigning the device", UserId: er.message });
+  }
+  setSubmitting(false);
+};
 
 const useStyles = makeStyles()((theme) => ({}));
 
 export default function ReassignForm({ disabled }: { disabled?: boolean }) {
-  const { values, errors, touched, setFieldValue, handleBlur, handleChange, isSubmitting } =
-    useFormik({
-      initialValues,
-      validate,
-      onSubmit,
-    });
-
-  const UserCacheVersion = useSubscribeToCacheChanges("Users");
-
-  const options = useMemo(
-    () => ListItemCache.get("Users").items.map((a) => a.Id),
-    [UserCacheVersion]
-  );
-
-  const { classes } = useStyles();
+  const {
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    handleBlur,
+    submitForm,
+    isSubmitting,
+    setSubmitting,
+    resetForm,
+  } = useFormik({
+    initialValues,
+    validate,
+    onSubmit,
+  });
 
   return (
     <>
       <UserAutocomplete
         fullWidth
         value={values.UserId}
-        handleChange={(props, value) => {
+        handleChange={(ev, value) => {
           setFieldValue("UserId", value);
         }}
+        name="UserId"
         error={errors.UserId}
         touched={touched.UserId}
         disabled={disabled || isSubmitting}
         handleBlur={handleBlur}
       />
+      <DeviceAutocomplete
+        fullWidth
+        name="DeviceId"
+        value={values.DeviceId}
+        handleChange={(ev, value) => {
+          setFieldValue("DeviceId", value);
+        }}
+        error={errors.DeviceId}
+        touched={touched.DeviceId}
+        disabled={disabled || isSubmitting}
+        handleBlur={handleBlur}
+      />
+
+      <Stack direction={"row"} spacing={4} marginTop={2}>
+        <Button
+          variant="contained"
+          disabled={disabled || isSubmitting}
+          onClick={() => {
+            submitForm().then(() => {
+              console.log("Submitted");
+            });
+          }}
+        >
+          Create Assignment
+        </Button>
+        <Button
+          variant="outlined"
+          disabled={disabled || isSubmitting}
+          onClick={() => {
+            submitForm().then(() => {
+              const hasErrors = Object.keys(errors).length;
+              if (!hasErrors) {
+                resetForm();
+              }
+            });
+          }}
+        >
+          Create and insert next
+        </Button>
+      </Stack>
     </>
   );
 }

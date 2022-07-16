@@ -5,8 +5,8 @@ import { FormikErrors, useFormikContext } from "formik";
 import { useMemo, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import useSubscribeToCacheChanges from "../../../../hooks/useSubscribeToCacheChanges";
-import { getCachedListItemById } from "../../../../utils/ListItemCache";
-import searchLists from "../../../../utils/searchLists";
+import { getCachedListItemById } from "../../../../lists/getCachedListItemById";
+import searchLists from "../../../../lists/searchLists";
 import { AssignmentFormValue } from "./../AssignmentForm";
 
 type Props = {

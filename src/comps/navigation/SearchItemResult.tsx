@@ -9,19 +9,16 @@ type SearchItemResultProps =
   | {
       onClick?: NavLinkProps["onClick"];
       href: string;
-
       icon?: ReactNode;
-      primary?: string;
-      secondary?: string;
+      primary?: ReactNode;
+      secondary?: ReactNode;
     }
   | {
       onClick: NavLinkProps["onClick"];
-
       href?: string;
-
       icon?: ReactNode;
-      primary?: string;
-      secondary?: string;
+      primary?: ReactNode;
+      secondary?: ReactNode;
     };
 
 export default function SearchItemResult({

@@ -1,5 +1,5 @@
 import DataLoader from "dataloader";
-import ListItemCache from "./ListItemCache";
+import ListItemCache from "../lists/ListItemCache";
 
 const loaders: {
   [key: string]: { [key: string]: DataLoader<any, any> };

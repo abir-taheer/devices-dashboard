@@ -1,7 +1,11 @@
 import { Stack } from "@mui/material";
 import Button from "@mui/material/Button";
 import { FormikConfig, FormikErrors, useFormik } from "formik";
+import { useEffect, useMemo } from "react";
 import { makeStyles } from "tss-react/mui";
+import { ListChangeEmitter } from "../../../hooks/useSubscribeToCacheChanges";
+import { getAssignmentsByDeviceId } from "../../../lists/getAssignmentsByDeviceId";
+import ListItemIndexedCache from "../../../lists/ListItemIndexedCache";
 import { sp } from "../../context/SPContext";
 import DeviceAutocomplete from "./fields/DeviceAutocomplete";
 import UserAutocomplete from "./fields/UserAutocomplete";
@@ -46,6 +50,7 @@ const onSubmit: FormConfig["onSubmit"] = async (values, { setSubmitting, setErro
       DeviceId: values.DeviceId,
       Status: "Active",
     });
+    ListChangeEmitter.emit("change", "Assignments");
   } catch (er) {
     setErrors({ DeviceId: "There was an error assigning the device", UserId: er.message });
   }
@@ -70,6 +75,16 @@ export default function ReassignForm({ disabled }: { disabled?: boolean }) {
     validate,
     onSubmit,
   });
+
+  const deviceAssignments = useMemo(
+    () => (values.DeviceId !== null ? getAssignmentsByDeviceId(values.DeviceId) : null),
+    [values.DeviceId]
+  );
+
+  useEffect(() => {
+    const a = ListItemIndexedCache.getIndex("Devices", "Id", "many");
+    console.log(a.items);
+  }, [values.DeviceId]);
 
   return (
     <>
@@ -97,6 +112,8 @@ export default function ReassignForm({ disabled }: { disabled?: boolean }) {
         disabled={disabled || isSubmitting}
         handleBlur={handleBlur}
       />
+
+      <pre>{JSON.stringify(deviceAssignments, null, 2)}</pre>
 
       <Stack direction={"row"} spacing={4} marginTop={2}>
         <Button

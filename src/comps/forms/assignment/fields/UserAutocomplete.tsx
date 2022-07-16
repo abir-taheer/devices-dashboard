@@ -9,8 +9,9 @@ import TextField from "@mui/material/TextField";
 import { useMemo } from "react";
 import { makeStyles } from "tss-react/mui";
 import useSubscribeToCacheChanges from "../../../../hooks/useSubscribeToCacheChanges";
-import ListItemCache, { getCachedListItemById } from "../../../../utils/ListItemCache";
-import searchLists from "../../../../utils/searchLists";
+import { getCachedListItemById } from "../../../../lists/getCachedListItemById";
+import ListItemCache from "../../../../lists/ListItemCache";
+import searchLists from "../../../../lists/searchLists";
 import TextHighlight from "../../../ui/TextHightlight";
 
 const useStyles = makeStyles()((theme) => ({
@@ -83,7 +84,7 @@ export default function UserAutocomplete({
           const workUnit = getCachedListItemById("WorkUnits", user.WorkUnitId);
 
           let address: string | undefined;
-          if (workUnit.Address) {
+          if (workUnit?.Address) {
             try {
               const { DisplayName } = JSON.parse(workUnit.Address);
               address = DisplayName;

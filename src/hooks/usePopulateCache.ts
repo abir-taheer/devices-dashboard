@@ -1,7 +1,8 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import SPContext from "../comps/context/SPContext";
 import { ALL_LISTS } from "../constants";
-import ListItemCache from "../utils/ListItemCache";
+import getAllListItemsFromServer from "../lists/getAllListItemsFromServer";
+import ListItemCache from "../lists/ListItemCache";
 import { ListChangeEmitter } from "./useSubscribeToCacheChanges";
 
 const maxCacheAge = 1000 * 60 * 2; // 2 minutes
@@ -22,9 +23,7 @@ export default function usePopulateCache<List extends ListName>() {
 
       setListsUpdating((prev) => [...prev, list]);
 
-      sp.web.lists
-        .getByTitle(list)
-        .items<ListDataMap[List][]>()
+      getAllListItemsFromServer(list)
         .then((items) => {
           ListItemCache.set(list, items);
         })

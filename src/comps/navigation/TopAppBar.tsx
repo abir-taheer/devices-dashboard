@@ -8,8 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import searchLists from "../../utils/searchLists";
+import { useLocation, useSearchParams } from "react-router-dom";
 import UniversalSearchResults from "./UniversalSearchResults";
 
 // This is the element that is presented below the search bar once the search is in focus and has a non-empty value
@@ -36,6 +35,11 @@ export default function TopAppBar({ setDrawerOpen }: Props) {
   const [searchParams] = useSearchParams();
 
   const hidden = searchParams.get("hideAppBar") === "true";
+  const location = useLocation();
+
+  useEffect(() => {
+    setFocused(false);
+  }, [location]);
 
   // If the typing variable is true, create a timer to set it to false in 200ms. Reset the timer every time the value changes
   useEffect(() => {
@@ -56,10 +60,6 @@ export default function TopAppBar({ setDrawerOpen }: Props) {
       setSearch(value);
     }
   }, [typing, search, value]);
-
-  useEffect(() => {
-    console.log(searchLists(search, ["WorkUnits", "Devices", "Users"]));
-  }, [search]);
 
   const toggleDrawer = () => setDrawerOpen((current) => !current);
 
